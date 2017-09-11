@@ -57,15 +57,9 @@ for f in file_list:
     records = []
     with gzip.open(f, 'rt') as handle:
         for seq_record in SeqIO.parse(handle, 'fasta'):
-            #cursor.execute('''INSERT INTO `proteins` 
-            #        (`organism`, `header`, `sequence`) 
-            #        VALUES
-            #        (%s, %s, %s)
-            #        ''',
-            #        (ident, seq_record.id, seq_record.seq)
-            #)
-            #conn.commit()
             records.append((ident, seq_record.id, seq_record.seq))
+
+        # It's faster to insert everything at once    
         cursor.executemany('''INSERT INTO `proteins` 
                 (`organism`, `header`, `sequence`) 
                 VALUES

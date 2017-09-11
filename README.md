@@ -25,6 +25,20 @@ From here, I ran the script ```create_protein_database.py``` to save the protein
 
 Each fasta file is uncompressed, read into memory, and then each protein sequence is inserted into the database. Even though each file is being inserted all at once, this process is still quite time consuming (there are over 6000 proteomes to process).
 
+After running ```create_protein_database.py```, run the following MySQL commands:
+```sql
+DROP TABLE IF EXISTS `organisms`;
+CREATE TABLE `organisms` (
+	`organism` VARCHAR(32)
+    );
+INSERT INTO `organisms`
+(`organism`)
+SELECT DISTINCT `organism` FROM `proteins`;
+```
+This will just create a table of all the unique organisms for which we have protein sequences. Eventually this should be incorporated into the python script, but for now it exists as a separate MySQL script.
+
+Also add an index for `organism` in the `proteins` table. This will speed things up later.
+
 ## Next Steps
 * Multiple sequence alignment
 * Looking at conserved residues
