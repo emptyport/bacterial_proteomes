@@ -39,6 +39,12 @@ This will just create a table of all the unique organisms for which we have prot
 
 Also add an index for `organism` in the `proteins` table. This will speed things up later.
 
+## BLAST Preparation
+
+Install NCBI BLAST and make sure it is in your path. For example, you should be able to type 'makeblastdb' from the command line/terminal without receiving an error about that being an unknown program.
+
+Once BLAST is installed, run ```make_blast_databases.py``` to create a BLAST database for each organism.
+
 ## Next Steps
 * Multiple sequence alignment
 * Looking at conserved residues
