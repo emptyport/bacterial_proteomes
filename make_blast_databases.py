@@ -34,7 +34,7 @@ organisms = cursor.fetchall()
 l = len(organisms)
 
 print 'Creating BLAST databases...'
-count = 1
+count = 0
 
 bar = progressbar.ProgressBar(
     widgets=[progressbar.Bar(marker='#', left='[', right=']'),
@@ -42,14 +42,7 @@ bar = progressbar.ProgressBar(
     maxval = len(organisms),
 ).start()
 
-for organism in organisms:
-    # search_pattern = './bacteria_proteomes/' + organism[0] + '*.fasta.gz'
-    # fasta_files = glob.glob(search_pattern)
-    # fasta_files = [f for f in fasta_files if not 'DNA.fasta' in f]
-    # f = fasta_files[0]
-    # path_to_fasta = os.path.dirname(os.path.realpath(__file__))
-    # file_and_path = path_to_fasta + f[1:]
-    
+for organism in organisms:    
     sql = 'SELECT `id`,`sequence` FROM `proteins` WHERE `organism`='
     sql += "'" + organism[0] + "'"
     cursor.execute(sql)
