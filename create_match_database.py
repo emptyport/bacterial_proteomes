@@ -1,6 +1,7 @@
+import os
 import MySQLdb
-from Bio import pairwise2
-from Bio.SubsMat.MatrixInfo import blosum62
+from Bio.Blast import NCBIXML
+from Bio.Blast.Applications import NcbiblastpCommandline as blastp_cline
 
 print '========================================'
 print 'Establishing connection with MySQL'
@@ -40,18 +41,59 @@ print 'Getting list of organisms...'
 sql = 'SELECT * FROM `organisms`'
 cursor.execute(sql)
 organisms = cursor.fetchall()
-print organisms[0][0]
 l = len(organisms)
 
 pairs = []
 
+curPath = os.path.dirname(os.path.realpath(__file__))
+
+print 'Running BLAST...'
 for i in range(0, l):
     sql = 'SELECT `id`,`sequence` FROM `proteins` WHERE `organism`='
     sql += "'" + organisms[i][0] + "'"
     cursor.execute(sql)
-    proteinsA = cursor.fetchall()
+    proteins = cursor.fetchall()
     
     for j in range(i+1, l):
+        blast_db_name = organisms[j][0]
+        
+        outfile = open('input.fasta', 'w')
+        for protein in proteins:
+            id = protein[0]
+            seq = protein[1]
+            outfile.write('>')
+            outfile.write(str(id))
+            outfile.write('\n')
+            outfile.write(seq)
+            outfile.write('\n\n')
+        outfile.close()
+
+        full_input = curPath + '/input.fasta'
+        full_db = curPath + '/blast_db/' + blast_db_name
+        full_output = 'blast_output.xml'
+
+        blastp = blastp_cline(query=full_input, db=full_db, evalue=0.001, outfmt=5, out=full_output)
+
+        result_handle = open('blast_output.xml')
+        blast_record = NCBIXML.read(result_handle)
+        print i,j,blast_record.alignments[0].hsps[0].identities
+            
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        '''
+        
         sql = 'SELECT `id`,`sequence` FROM `proteins` WHERE `organism`='
         sql += "'" + organisms[j][0] + "'"
         print i,j
@@ -74,12 +116,13 @@ for i in range(0, l):
                     idB = pB[0]
             
             cursor.execute(
-                '''INSERT INTO `protein_pairs`
+                INSERT INTO `protein_pairs`
                 (proteinA, proteinB)
                 VALUES
                 (%s, %s)
-                ''',
+                ,
                 [idA, idB]
             )
+            '''
 
         

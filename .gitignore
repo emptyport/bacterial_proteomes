@@ -1,3 +1,7 @@
 bacteria_proteomes
 blast_db
 temp.fasta
+input.fasta
+blast_output.xml
+blast_output.tsv
+.~lock.blast_output.tsv#
