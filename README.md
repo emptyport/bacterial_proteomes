@@ -49,3 +49,15 @@ Once BLAST is installed, run ```make_blast_databases.py``` to create a BLAST dat
 * Multiple sequence alignment
 * Looking at conserved residues
 * Putting it all together
+
+
+
+
+## OrthoDB stuff
+
+Download from http://www.orthodb.org/?page=filelist
+
+```grep -v '/\*' ODB.sql > ODB_mod.sql``` Don't know if this is required, but I did run it before the next step
+
+```sed -i 's/ TYPE=MyISAM;/;/g' ODB_mod.sql``` to make compatible with current MySQL version
+
