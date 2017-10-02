@@ -32,6 +32,8 @@ While trying to import the SQL dump, I discovered that there are some incompatib
 
 4. ```analyze table species,levels,genes,OGs,OG2genes;``` According to the README from OrthoDB, you should run this command from the MySQL prompt to make sure there weren't any errors during import.
 
+The README from OrthoDB also has some examples of how the tables are related to each other. The OG2genes table is particularly useful because it gives each gene along with its gene group aka ortholog group.
+
 #### Protein Sequences
 
 While your ortholog database is importing, go ahead and download and extract all the fasta.tar.gz files, or at least the ones you want to include. Extract them to the same directory as where this code is. Each extract will create a file with the name of the organism group. For example, ```odb9v2_protozoa_fasta.tar.gz``` will create a folder named 'protozoa' that further contains a folder named 'Rawdata' with the fasta files inside that.
