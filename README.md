@@ -36,7 +36,22 @@ While trying to import the SQL dump, I discovered that there are some incompatib
 
 While your ortholog database is importing, go ahead and download and extract all the fasta.tar.gz files, or at least the ones you want to include. Extract them to the same directory as where this code is. Each extract will create a file with the name of the organism group. For example, ```odb9v2_protozoa_fasta.tar.gz``` will create a folder named 'protozoa' that further contains a folder named 'Rawdata' with the fasta files inside that.
 
+Available databases with number of organisms in each (as of Sep. 27, 2017)
+
+* archea (345)
+* bacteria (3663)
+* fungi (227)
+* metazoa (331)
+* plants (31)
+* protozoa (73)
+* viridae (3138)
+
+There aren't as many organisms as you could get from say the Uniprot reference proteomes, but each protein in these files has been assigned to an ortholog group which should make it easy to get going with a SCA analysis.
+
 Once all the gzipped tar files have been extracted, run ```create_protein_database.py``` to create a table of all the protein sequences. Please keep in mind that this script will delete and re-create the ```proteins``` table each time you run it, so if you want to later add in some new fasta files, you will have to either edit the code to not delete the table or just suffer through creating the table again. I believe it took about 45 minutes to an hour on my machine to create the table and insert all the sequences.
 
+#### Other Scripts
+
+The ```create_match_database.py``` and ```make_blast_databases.py``` scripts are from the master branch and currently don't do anything in this branch.
 
 
