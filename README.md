@@ -2,62 +2,41 @@
 
 > This repository consists of some code I'm developing while learning about gene coupling and co-evolution
 
-## Obtaining the Data
-I downloaded bacterial proteomes from Uniprot using the following commands in a bash terminal:
-```shell
-mkdir bacteria_proteomes
+> I am on a Linux system, so be aware that some of these commands may not work exactly as they are written on your system. If you are running a bash shell, such as in Linux or Mac systems, these commands might work as written (or you might need to install homebrew if you are on a Mac). If you are on Windows, you can look up equivalent commands or you could try a Linux subsystem for Windows or maybe Cygwin.
 
-cd bacteria_proteomes
+## Prerequisites
 
-wget ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Bacteria/*
-```
-I downloaded the proteomes on Tuesday, Sep 5, 2017. It took a good part of the day to finish. The "Date Modified" says 8/30/17 on Uniprot's ftp server.
+You will need to have Python installed (at least version 2.7) with the following modules:
 
-From here, I ran the script ```create_protein_database.py``` to save the proteins to a MySQL table. Once you install MySQL, just create a database and user and put that information in the script; the script will take care of creating the table. The table structure is as follows:
+* biopython
+* progressbar2
+* MySQL-python
 
-* **id** is the primary key and is set to autoincrement
+You will also need to have MySQL installed with a user created for the scripts. For now the user information is coded directly into the scripts near the beginning.
 
-* **organism** follows the format "UP000028641" and as far as I can tell is an identifier set by Uniprot
+## Obtaining the Data from OrthoDB
 
-* **header** is the header information for each protein sequence in the fasta file
+> All data is downloaded from http://www.orthodb.org/?page=filelist
 
-* **sequence** is the protein sequence itself
+#### Ortholog Database
 
-Each fasta file is uncompressed, read into memory, and then each protein sequence is inserted into the database. Even though each file is being inserted all at once, this process is still quite time consuming (there are over 6000 proteomes to process).
+The first step is to download and extract ```ODB.sql.gz``` and get started with the SQL import.
 
-After running ```create_protein_database.py```, run the following MySQL commands:
-```sql
-DROP TABLE IF EXISTS `organisms`;
-CREATE TABLE `organisms` (
-	`organism` VARCHAR(32)
-    );
-INSERT INTO `organisms`
-(`organism`)
-SELECT DISTINCT `organism` FROM `proteins`;
-```
-This will just create a table of all the unique organisms for which we have protein sequences. Eventually this should be incorporated into the python script, but for now it exists as a separate MySQL script.
+While trying to import the SQL dump, I discovered that there are some incompatibilites with my version of MySQL server. The following steps should resolve the issues. Steps 1-3 were run from the terminal.
 
-Also add an index for `organism` in the `proteins` table. This will speed things up later.
+1. ```grep -v '/\*' ODB.sql > ODB_mod.sql``` I don't know if this is required, but initially I thought the issue was with the comments in the .sql file so I ran this step to remove them. This step might not actually be necessary, so feel free to skip step 1 for now and see if the following steps work.
 
-## BLAST Preparation
+2. ```sed -i 's/ TYPE=MyISAM;/;/g' ODB_mod.sql``` This step is required because there are a bunch of "TYPE-MyISAM;" statements that are no longer compatible with MySQL server. This command removes those fragments to make the file compatible with the current MySQL version.
 
-Install NCBI BLAST and make sure it is in your path. For example, you should be able to type 'makeblastdb' from the command line/terminal without receiving an error about that being an unknown program.
+3. ```cat ODB_mod.sql | mysql -u pyscript -p -h localhost bacteria``` will import the .sql file. Replace the user, host, and table with the details of your setup. This took about a full day (24 hours) to insert into my database on my local machine.
 
-Once BLAST is installed, run ```make_blast_databases.py``` to create a BLAST database for each organism.
+4. ```analyze table species,levels,genes,OGs,OG2genes;``` According to the README from OrthoDB, you should run this command from the MySQL prompt to make sure there weren't any errors during import.
 
-## Next Steps
-* Multiple sequence alignment
-* Looking at conserved residues
-* Putting it all together
+#### Protein Sequences
+
+While your ortholog database is importing, go ahead and download and extract all the fasta.tar.gz files, or at least the ones you want to include. Extract them to the same directory as where this code is. Each extract will create a file with the name of the organism group. For example, ```odb9v2_protozoa_fasta.tar.gz``` will create a folder named 'protozoa' that further contains a folder named 'Rawdata' with the fasta files inside that.
+
+Once all the gzipped tar files have been extracted, run ```create_protein_database.py``` to create a table of all the protein sequences. Please keep in mind that this script will delete and re-create the ```proteins``` table each time you run it, so if you want to later add in some new fasta files, you will have to either edit the code to not delete the table or just suffer through creating the table again. I believe it took about 45 minutes to an hour on my machine to create the table and insert all the sequences.
 
 
-
-
-## OrthoDB stuff
-
-Download from http://www.orthodb.org/?page=filelist
-
-```grep -v '/\*' ODB.sql > ODB_mod.sql``` Don't know if this is required, but I did run it before the next step
-
-```sed -i 's/ TYPE=MyISAM;/;/g' ODB_mod.sql``` to make compatible with current MySQL version
 

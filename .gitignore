@@ -1,6 +1,12 @@
+archea
 bacteria
 bacteria_proteomes
 blast_db
+fungi
+metazoa
+plants
+protozoa
+viridae
 temp.fasta
 input.fasta
 blast_output.xml
